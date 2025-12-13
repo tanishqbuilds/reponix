@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+# package lock files
+package-lock.json
+
 # testing
 /coverage
 
@@ -19,6 +22,18 @@
 
 # production
 /build
+/dist
+
+# Python
+venv/
+env/
+.venv/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 
 # misc
 .DS_Store
@@ -39,3 +54,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
