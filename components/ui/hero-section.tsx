@@ -8,6 +8,45 @@ import { Github, ArrowRight, Sparkles } from "lucide-react"
 export function HeroSection() {
   const [repoUrl, setRepoUrl] = useState("")
   const [isFocused, setIsFocused] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  const handleSubmit = async () => {
+    if (!repoUrl.trim()) {
+      setError("Please enter a repository URL")
+      return
+    }
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to analyze repository")
+      }
+
+      // Store results in sessionStorage
+      sessionStorage.setItem("analysisResults", JSON.stringify(data))
+
+      // Navigate to results page
+      window.location.href = "/results"
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20">
@@ -35,11 +74,10 @@ export function HeroSection() {
         {/* Input and CTA */}
         <div className="max-w-2xl mx-auto reveal reveal-delay-3">
           <div
-            className={`flex flex-col sm:flex-row gap-3 p-2 rounded-xl bg-card border transition-all duration-300 ${
-              isFocused
-                ? "border-primary/50 shadow-[0_0_30px_oklch(0.723_0.219_149.579_/_0.15)]"
-                : "border-border glow-input"
-            }`}
+            className={`flex flex-col sm:flex-row gap-3 p-2 rounded-xl bg-card border transition-all duration-300 ${isFocused
+              ? "border-primary/50 shadow-[0_0_30px_oklch(0.723_0.219_149.579_/_0.15)]"
+              : "border-border glow-input"
+              }`}
           >
             <div className="flex-1 flex items-center gap-3 px-4">
               <Github className="w-5 h-5 text-muted-foreground flex-shrink-0" />
@@ -55,12 +93,29 @@ export function HeroSection() {
             </div>
             <Button
               size="lg"
-              className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 glow-button font-semibold"
+              onClick={handleSubmit}
+              disabled={isLoading || !repoUrl.trim()}
+              className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 glow-button font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Analyze Now
-              <ArrowRight className="w-4 h-4 ml-2" />
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent mr-2"></div>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  Analyze Now
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
             </Button>
           </div>
+
+          {error && (
+            <p className="text-sm text-destructive mt-4">
+              {error}
+            </p>
+          )}
 
           <p className="text-sm text-muted-foreground mt-4">
             Free analysis for public repositories. No sign-up required.

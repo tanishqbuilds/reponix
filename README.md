@@ -1,36 +1,242 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Devlyzer 🔍
 
-## Getting Started
+> AI-powered code analysis platform for GitHub repositories
 
-First, run the development server:
+Devlyzer is a comprehensive repository analysis tool that uses AI to detect security vulnerabilities, code quality issues, and AI-generated code. Built with Next.js and powered by Groq's LLM.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+
+- 🔒 **Security Analysis** - Detect vulnerabilities with severity ratings
+- ⚡ **Code Quality** - Identify bugs, code smells, and performance issues
+- 🤖 **AI Detection** - Find potentially AI-generated code patterns
+- 📊 **Visual Dashboard** - Beautiful results page with score cards and metrics
+- 🚀 **Fast Analysis** - Powered by Groq's high-speed LLM
+- 🎯 **Smart Filtering** - Analyzes only relevant code files
+- 💡 **Actionable Insights** - Get specific recommendations for improvement
+
+## 🖼️ Screenshots
+
+### Home Page
+Clean, modern interface for repository analysis
+
+### Results Dashboard
+Comprehensive visualization of analysis results with scores, vulnerabilities, and recommendations
+
+## 🏗️ Architecture
+
+```
+Client (Next.js) → POST repo URL → API Route (/api/analyze)
+  ├─ Validate URL
+  ├─ Verify repository exists
+  ├─ Fetch repository files (GitHub API)
+  ├─ Filter & chunk files (max 100 files, 500KB each)
+  ├─ Format for AI analysis
+  └─ Analyze with Groq AI → Structured JSON response
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18+ 
+- npm or yarn
+- Groq API key ([Get one here](https://console.groq.com))
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/tanishqmsd/devlyzer.git
+   cd devlyzer
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Set up environment variables**
+   
+   Create a `.env.local` file in the root directory:
+   ```env
+   GROQ_API_KEY=your_groq_api_key_here
+   ```
 
-## Deploy on Vercel
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📖 Usage
+
+1. **Enter Repository URL**
+   - Paste any public GitHub repository URL
+   - Supports formats: `https://github.com/owner/repo` or `git@github.com:owner/repo.git`
+
+2. **Analyze**
+   - Click "Analyze Now" button
+   - Wait 30-60 seconds for AI analysis
+
+3. **View Results**
+   - Automatically redirected to results page
+   - Review scores, vulnerabilities, and recommendations
+   - Navigate back to analyze another repository
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 16** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **shadcn/ui** - UI components
+- **Lucide React** - Icons
+
+### Backend
+- **Next.js API Routes** - Serverless functions
+- **Groq SDK** - AI analysis
+- **GitHub API** - Repository fetching
+
+### AI
+- **Groq** - Fast LLM inference
+- **Llama 3.3 70B** - Code analysis model
+
+## 📁 Project Structure
+
+```
+devlyzer/
+├── app/
+│   ├── api/
+│   │   └── analyze/          # Main analysis API route
+│   │       └── route.ts
+│   ├── results/              # Results page
+│   │   └── page.tsx
+│   └── page.tsx              # Home page
+├── components/
+│   └── ui/
+│       ├── hero-section.tsx  # Landing page hero
+│       ├── button.tsx        # UI components
+│       └── ...
+├── lib/
+│   ├── validators.ts         # URL & repo validation
+│   ├── file-processor.ts     # File fetching & filtering
+│   └── ai-analyzer.ts        # Groq AI integration
+└── .env.local               # Environment variables
+```
+
+## 🔧 Configuration
+
+### File Limits
+
+Adjust in `lib/file-processor.ts`:
+```typescript
+const MAX_FILES = 100         // Maximum files to analyze
+const MAX_FILE_SIZE = 500KB   // Maximum file size
+```
+
+### Supported File Types
+
+```typescript
+const ALLOWED_EXTENSIONS = [
+  '.js', '.jsx', '.ts', '.tsx',  // JavaScript/TypeScript
+  '.py',                          // Python
+  '.java', '.go', '.rs',          // Other languages
+  '.md', '.json', '.yml'          // Documentation/Config
+]
+```
+
+### Analysis Timeout
+
+Adjust in `app/api/analyze/route.ts`:
+```typescript
+export const maxDuration = 60  // Timeout in seconds
+```
+
+## 🔑 API Reference
+
+### POST /api/analyze
+
+Analyzes a GitHub repository.
+
+**Request Body:**
+```json
+{
+  "repoUrl": "https://github.com/owner/repo"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "repository": "owner/repo",
+  "analysis": {
+    "overall": {
+      "score": 85,
+      "summary": "Good code quality with minor issues",
+      "aiDetectionProbability": 25
+    },
+    "security": {
+      "vulnerabilities": [...],
+      "score": 90
+    },
+    "codeQuality": {
+      "issues": [...],
+      "score": 82
+    },
+    "aiGenerated": {
+      "suspiciousFiles": [...],
+      "patterns": [...]
+    },
+    "recommendations": [...]
+  }
+}
+```
+
+## 🎯 Scoring System
+
+### Overall Score (0-100)
+- **80-100**: Excellent code quality
+- **60-79**: Good with minor improvements needed
+- **40-59**: Moderate issues, attention required
+- **0-39**: Significant issues found
+
+### Security Severity
+- 🔴 **Critical** - Immediate action required
+- 🟠 **High** - Should be addressed soon
+- 🟡 **Medium** - Address when possible
+- 🔵 **Low** - Minor concern
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- [Groq](https://groq.com) - For fast AI inference
+- [shadcn/ui](https://ui.shadcn.com) - For beautiful UI components
+- [Lucide](https://lucide.dev) - For amazing icons
+- [Vercel](https://vercel.com) - For Next.js and hosting
+
+## 📧 Contact
+
+Tanishq - [@tanishqmsd](https://github.com/tanishqmsd)
+
+Project Link: [https://github.com/tanishqmsd/devlyzer](https://github.com/tanishqmsd/devlyzer)
+
+---
+
+Made with ❤️ by [Tanishq](https://github.com/tanishqmsd)
