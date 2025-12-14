@@ -5,7 +5,6 @@ import type React from "react"
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
 
-import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import {
     ArrowLeft,
@@ -81,7 +80,6 @@ interface AnalysisData {
 }
 
 export default function ResultsPage() {
-    const searchParams = useSearchParams()
     const [data, setData] = useState<AnalysisData | null>(null)
     const [loading, setLoading] = useState(true)
 
