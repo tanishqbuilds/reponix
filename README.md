@@ -1,4 +1,4 @@
-# Devlyzer 🔍
+# REPONIX 🔍
 
 > AI-powered code analysis platform for GitHub repositories
 
