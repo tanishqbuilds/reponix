@@ -220,23 +220,20 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+
 ## 📝 License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
 
-- [Groq](https://groq.com) - For fast AI inference
-- [shadcn/ui](https://ui.shadcn.com) - For beautiful UI components
-- [Lucide](https://lucide.dev) - For amazing icons
-- [Vercel](https://vercel.com) - For Next.js and hosting
+
 
 ## 📧 Contact
 
-Tanishq - [@tanishqmsd](https://github.com/tanishqmsd)
+Tanishq - [@tanishqbuilds](https://github.com/tanishqbuilds)
 
-Project Link: [https://github.com/tanishqmsd/devlyzer](https://github.com/tanishqmsd/devlyzer)
+Project Link: [https://github.com/tanishqbuilds/devlyzer](https://github.com/tanishqbuilds/devlyzer)
 
 ---
 
-Made with ❤️ by [Tanishq](https://github.com/tanishqmsd)
+Made with ❤️ by [Tanishq](https://github.com/tanishqbuilds)
