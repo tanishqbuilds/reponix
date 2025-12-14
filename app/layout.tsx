@@ -73,7 +73,7 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "CZ2Qm2fHMXL1NA0yJi3hIrfEvjTCJ1p4Hp5MCpoJX0E",
-    // yandex: "your-yandex-verification-code",
+    // yandex: "your-yandex-verification-code",<meta name="google-site-verification" content="CZ2Qm2fHMXL1NA0yJi3hIrfEvjTCJ1p4Hp5MCpoJX0E" />
   },
   icons: {
     icon: [

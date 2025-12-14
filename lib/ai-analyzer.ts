@@ -1,20 +1,16 @@
-/**
- * AI-powered code analysis using Groq
- */
 
 import Groq from 'groq-sdk';
 import { FileItem } from './file-processor';
 
-// Initialize Groq client
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY,
 });
 
 export interface AnalysisResult {
     overall: {
-        score: number; // 0-100
+        score: number;
         summary: string;
-        aiDetectionProbability: number; // 0-100
+        aiDetectionProbability: number;
     };
     security: {
         vulnerabilities: Array<{
@@ -38,7 +34,7 @@ export interface AnalysisResult {
     aiGenerated: {
         suspiciousFiles: Array<{
             file: string;
-            confidence: number; // 0-100
+            confidence: number;
             reasons: string[];
         }>;
         patterns: string[];
@@ -46,20 +42,16 @@ export interface AnalysisResult {
     recommendations: string[];
 }
 
-/**
- * Analyze repository code using Groq AI
- */
+
 export async function analyzeCodeWithGroq(
     files: FileItem[],
     repoName: string
 ): Promise<AnalysisResult> {
     try {
-        // Create a focused prompt for code analysis
         const prompt = createAnalysisPrompt(files, repoName);
 
-        // Call Groq API
         const completion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile', // Fast and capable model
+            model: 'llama-3.3-70b-versatile',
             messages: [
                 {
                     role: 'system',
@@ -76,12 +68,10 @@ Always respond with valid JSON only, no markdown formatting.`,
                     content: prompt,
                 },
             ],
-            temperature: 0.3, // Lower temperature for more consistent analysis
+            temperature: 0.3,
             max_tokens: 4000,
             response_format: { type: 'json_object' },
         });
-
-        // Parse response
         const responseText = completion.choices[0]?.message?.content;
         if (!responseText) {
             throw new Error('No response from Groq API');
@@ -89,7 +79,6 @@ Always respond with valid JSON only, no markdown formatting.`,
 
         const analysis = JSON.parse(responseText);
 
-        // Structure and validate the response
         return formatAnalysisResult(analysis);
 
     } catch (error) {
@@ -100,9 +89,6 @@ Always respond with valid JSON only, no markdown formatting.`,
     }
 }
 
-/**
- * Create analysis prompt from files
- */
 function createAnalysisPrompt(files: FileItem[], repoName: string): string {
     let prompt = `Analyze the following repository: ${repoName}\n\n`;
     prompt += `Total files: ${files.length}\n\n`;
@@ -174,9 +160,6 @@ function createAnalysisPrompt(files: FileItem[], repoName: string): string {
     return prompt;
 }
 
-/**
- * Format and validate AI response
- */
 function formatAnalysisResult(rawAnalysis: any): AnalysisResult {
     return {
         overall: {
