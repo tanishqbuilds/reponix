@@ -6,6 +6,7 @@ import {
     createRepoSummary
 } from '@/lib/file-processor';
 import { analyzeCodeWithGroq } from '@/lib/ai-analyzer';
+import { cookies } from 'next/headers';
 
 export const maxDuration = 60; // 60 second timeout for AI analysis
 
@@ -36,8 +37,21 @@ export async function POST(req: Request) {
 
         const { owner, repo } = repoInfo;
 
+        // Get token from session cookie if present
+        let token: string | undefined = undefined;
+        try {
+            const cookieStore = await cookies();
+            const sessionCookie = cookieStore.get('reponix_session');
+            if (sessionCookie?.value) {
+                const session = JSON.parse(sessionCookie.value);
+                token = session.accessToken;
+            }
+        } catch (e) {
+            // Ignore session errors
+        }
+
         // Validate repository exists
-        const validation = await validateRepoExists(owner, repo);
+        const validation = await validateRepoExists(owner, repo, token);
         if (!validation.valid) {
             return NextResponse.json(
                 {
@@ -49,7 +63,7 @@ export async function POST(req: Request) {
         }
 
         // Fetch and process files
-        const processedRepo = await fetchAndFilterFiles(owner, repo);
+        const processedRepo = await fetchAndFilterFiles(owner, repo, undefined, token);
 
         if (processedRepo.files.length === 0) {
             return NextResponse.json(

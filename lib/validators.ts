@@ -53,15 +53,22 @@ export function parseGitHubUrl(url: string): GitHubRepoInfo | null {
  */
 export async function validateRepoExists(
     owner: string,
-    repo: string
+    repo: string,
+    token?: string
 ): Promise<{ valid: boolean; error?: string }> {
     try {
+        const headers: Record<string, string> = {
+            Accept: 'application/vnd.github.v3+json',
+        };
+
+        if (token) {
+            headers['Authorization'] = `token ${token}`;
+        }
+
         const response = await fetch(
             `https://api.github.com/repos/${owner}/${repo}`,
             {
-                headers: {
-                    Accept: 'application/vnd.github.v3+json',
-                },
+                headers,
             }
         );
 

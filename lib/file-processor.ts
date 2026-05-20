@@ -85,7 +85,8 @@ export function shouldExcludeFile(filePath: string): boolean {
 export async function fetchAndFilterFiles(
     owner: string,
     repo: string,
-    branch: string = 'main'
+    branch: string = 'main',
+    token?: string
 ): Promise<ProcessedRepo> {
     const result: ProcessedRepo = {
         owner,
@@ -100,16 +101,24 @@ export async function fetchAndFilterFiles(
     try {
         // Fetch repository tree
         const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+        
+        const headers: Record<string, string> = {
+            Accept: 'application/vnd.github.v3+json',
+            'User-Agent': 'Reponix-App',
+        };
+
+        if (token) {
+            headers['Authorization'] = `token ${token}`;
+        }
+
         const treeResponse = await fetch(treeUrl, {
-            headers: {
-                Accept: 'application/vnd.github.v3+json',
-            },
+            headers,
         });
 
         if (!treeResponse.ok) {
             // Try 'master' branch if 'main' fails
             if (branch === 'main') {
-                return fetchAndFilterFiles(owner, repo, 'master');
+                return fetchAndFilterFiles(owner, repo, 'master', token);
             }
             throw new Error(`Failed to fetch repository tree: ${treeResponse.status}`);
         }
@@ -119,18 +128,39 @@ export async function fetchAndFilterFiles(
 
         result.totalFiles = tree.length;
 
-        // Filter files
+        // Sort tree by importance to ensure we fetch critical files first
+        const getImportance = (path: string) => {
+            const p = path.toLowerCase();
+            if (p.includes('package.json')) return 100;
+            if (p.includes('middleware') || p.includes('auth')) return 95;
+            if (p.includes('config') || p.includes('.env.example')) return 90;
+            if (p.includes('api/') || p.includes('routes/')) return 80;
+            if (p.includes('lib/') || p.includes('utils/') || p.includes('services/')) return 70;
+            if (p.includes('models/') || p.includes('db/')) return 60;
+            return 50;
+        };
+
+        // Filter and sort files
         const filesToFetch = tree
             .filter((item: any) => item.type === 'blob')
             .filter((item: any) => !shouldExcludeFile(item.path))
             .filter((item: any) => shouldIncludeFile(item.path))
+            .sort((a: any, b: any) => getImportance(b.path) - getImportance(a.path))
             .slice(0, MAX_FILES); // Limit number of files
 
         // Fetch file contents
         for (const item of filesToFetch) {
             try {
                 const fileUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${item.path}`;
-                const fileResponse = await fetch(fileUrl);
+                
+                const fileHeaders: Record<string, string> = {};
+                if (token) {
+                    fileHeaders['Authorization'] = `token ${token}`;
+                }
+
+                const fileResponse = await fetch(fileUrl, {
+                    headers: fileHeaders,
+                });
 
                 if (!fileResponse.ok) {
                     result.skippedFiles.push(item.path);
