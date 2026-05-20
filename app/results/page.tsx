@@ -21,6 +21,7 @@ import {
     Lightbulb,
     Sparkles,
     ChevronRight,
+    Download,
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -167,7 +168,7 @@ export default function ResultsPage() {
 
     return (
         <div className="min-h-screen bg-background">
-            <div className="border-b border-border/40 bg-card/30 backdrop-blur-xl sticky top-0 z-10">
+            <div className="border-b border-border/40 bg-card/30 backdrop-blur-xl sticky top-0 z-10 print:hidden">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex items-center justify-between">
                         <Link href="/">
@@ -177,18 +178,158 @@ export default function ResultsPage() {
                             </Button>
                         </Link>
                         <div className="text-center flex-1">
-                            <div className="inline-flex items-center gap-2 mb-1">
-                                <Activity className="w-4 h-4 text-primary" />
-                                <h1 className="text-lg font-bold text-balance">{data.repository}</h1>
+                            <div className="inline-flex items-center gap-2.5 mb-1 justify-center">
+                                <img
+                                    src="/logo.png"
+                                    alt="Reponix Logo"
+                                    className="w-5 h-5 rounded-md object-cover flex-shrink-0"
+                                />
+                                <h1 className="text-lg font-bold text-balance m-0">{data.repository}</h1>
                             </div>
                             <p className="text-xs text-muted-foreground">{new Date(data.metadata.processedAt).toLocaleString()}</p>
                         </div>
-                        <div className="w-[72px]"></div>
+                        <Button 
+                            onClick={() => window.print()} 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-2 bg-primary/10 border-primary/25 hover:bg-primary/20 text-primary hover:text-primary transition-all rounded-lg shrink-0 print:hidden"
+                        >
+                            <Download className="w-4 h-4" />
+                            <span className="hidden sm:inline">Download PDF</span>
+                        </Button>
                     </div>
                 </div>
             </div>
 
             <div className="container mx-auto px-4 py-8 max-w-7xl">
+                {/* Print-Only Branded Header */}
+                <div className="hidden print:flex items-center justify-between border-b-2 border-primary/20 pb-6 mb-8 w-full">
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/logo.png"
+                            alt="Reponix Logo"
+                            className="w-10 h-10 rounded-lg object-cover"
+                        />
+                        <div className="text-left">
+                            <h1 className="text-2xl font-bold text-foreground tracking-tight m-0">REPONIX</h1>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold m-0">AI Code Analysis & Security Audit</p>
+                        </div>
+                    </div>
+                    <div className="text-right leading-tight">
+                        <p className="text-sm font-bold text-foreground m-0">AUDIT REPORT</p>
+                        <p className="text-xs text-muted-foreground m-0">{new Date(data.metadata.processedAt).toLocaleDateString()}</p>
+                    </div>
+                </div>
+
+                {/* Custom Dynamic Print Stylesheet for Premium PDF Branding */}
+                <style dangerouslySetInnerHTML={{ __html: `
+                    @media print {
+                        /* Print Base Configs */
+                        html, body {
+                            background-color: #ffffff !important;
+                            color: #0f172a !important;
+                            font-family: system-ui, -apple-system, sans-serif !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        
+                        /* Hide interactive screens and navbar wrapper */
+                        .print\\:hidden, button, a, nav, .sticky, header, footer, [role="button"] {
+                            display: none !important;
+                        }
+                        
+                        /* Grid & Container formatting */
+                        .container {
+                            max-width: 100% !important;
+                            width: 100% !important;
+                            padding: 0 1cm !important;
+                            margin: 0 !important;
+                        }
+                        
+                        .grid {
+                            display: grid !important;
+                            gap: 16px !important;
+                        }
+                        .grid-cols-1 { grid-template-columns: 1fr !important; }
+                        .grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+                        .grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+                        .md\\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+
+                        /* Convert Glassmorphism Cards to Premium White High-Contrast Printed Layout */
+                        .bg-card\\/40, .bg-gradient-to-br, .bg-card, .bg-muted\\/30, .p-8 {
+                            background: #ffffff !important;
+                            background-color: #ffffff !important;
+                            border: 1px solid #e2e8f0 !important;
+                            color: #0f172a !important;
+                            box-shadow: none !important;
+                            break-inside: avoid !important;
+                            page-break-inside: avoid !important;
+                            border-radius: 12px !important;
+                            margin-bottom: 16px !important;
+                            padding: 20px !important;
+                        }
+
+                        .bg-primary\\/5 {
+                            background-color: #f8fafc !important;
+                            border: 1px solid #e2e8f0 !important;
+                        }
+
+                        /* High contrast styling for text metrics */
+                        .text-muted-foreground {
+                            color: #475569 !important;
+                        }
+                        .text-foreground {
+                            color: #0f172a !important;
+                        }
+                        
+                        /* Colors & Progress Rings */
+                        .stroke-muted {
+                            stroke: #e2e8f0 !important;
+                        }
+                        .text-emerald-500 { color: #059669 !important; }
+                        .stroke-emerald-500 { stroke: #059669 !important; }
+                        .text-amber-500 { color: #d97706 !important; }
+                        .stroke-amber-500 { stroke: #d97706 !important; }
+                        .text-orange-500 { color: #ea580c !important; }
+                        .stroke-orange-500 { stroke: #ea580c !important; }
+                        .text-rose-500 { color: #dc2626 !important; }
+                        .stroke-rose-500 { stroke: #dc2626 !important; }
+                        .text-purple-500 { color: #7c3aed !important; }
+                        .stroke-purple-500 { stroke: #7c3aed !important; }
+
+                        /* Typography and Titles */
+                        h1, h2, h3, h4, h5, h6 {
+                            color: #0f172a !important;
+                            font-weight: 700 !important;
+                            break-after: avoid !important;
+                            page-break-after: avoid !important;
+                        }
+
+                        /* Specific Badges and code elements */
+                        code {
+                            background-color: #f1f5f9 !important;
+                            border: 1px solid #e2e8f0 !important;
+                            color: #334155 !important;
+                            padding: 2px 6px !important;
+                            font-size: 85% !important;
+                        }
+
+                        /* Page break configurations */
+                        .mb-10 {
+                            margin-bottom: 24px !important;
+                            break-inside: avoid !important;
+                            page-break-inside: avoid !important;
+                        }
+
+                        @page {
+                            size: A4 portrait;
+                            margin: 1.5cm;
+                        }
+                    }
+                }
+            ` }} />
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                     <CircularScoreCard
                         icon={<TrendingUp className="w-5 h-5" />}
