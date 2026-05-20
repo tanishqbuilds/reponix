@@ -1,16 +1,21 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
         const cookieStore = await cookies();
         cookieStore.delete('reponix_session');
         
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const host = req.headers.get('host') || 'localhost:3000';
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        const appUrl = `${protocol}://${host}`;
         return NextResponse.redirect(appUrl);
     } catch (error) {
         console.error('Logout error:', error);
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        
+        const host = req.headers.get('host') || 'localhost:3000';
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        const appUrl = `${protocol}://${host}`;
         return NextResponse.redirect(appUrl);
     }
 }

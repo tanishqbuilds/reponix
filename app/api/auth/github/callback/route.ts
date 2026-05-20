@@ -82,12 +82,18 @@ export async function GET(req: Request) {
         });
 
         // 5. Redirect back to homepage
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const host = req.headers.get('host') || 'localhost:3000';
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        const appUrl = `${protocol}://${host}`;
         return NextResponse.redirect(appUrl);
 
     } catch (error) {
         console.error('OAuth callback error:', error);
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        
+        // Construct fallback URL dynamically
+        const host = req.headers.get('host') || 'localhost:3000';
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        const appUrl = `${protocol}://${host}`;
         return NextResponse.redirect(`${appUrl}?auth_error=failed`);
     }
 }

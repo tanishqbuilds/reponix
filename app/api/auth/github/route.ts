@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req: Request) {
     const clientId = process.env.GITHUB_CLIENT_ID;
     
     if (!clientId) {
@@ -10,7 +10,9 @@ export async function GET() {
         );
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const host = req.headers.get('host') || 'localhost:3000';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const appUrl = `${protocol}://${host}`;
     const redirectUri = `${appUrl}/api/auth/github/callback`;
     const scope = 'repo read:user';
     const state = Math.random().toString(36).substring(2, 15);
