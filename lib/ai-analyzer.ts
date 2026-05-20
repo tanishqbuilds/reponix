@@ -134,11 +134,9 @@ function createAnalysisPrompt(
        - Is it overly clean, uses generic 'tutorial-style' boilerplate, or has perfect but robotic documentation (AI)?
        - BE DECISIVE: High Human score (>90%) for idiosyncratic code; High AI score (>70%) for clear boilerplate. Don't default to 20%.\n\n`;
 
-    prompt += `### FILE CONTENTS ###\n\n`;
-
-    // Include as many files as possible within a reasonable limit, prioritizing top-importance
+    prompt += `### FILE CONTENTS ###\n\n`;    // Include as many files as possible within a reasonable limit, prioritizing top-importance
     let currentTokenEstimate = 0;
-    const MAX_TOKENS_ESTIMATE = 10000; // Rough estimate to keep prompt manageable
+    const MAX_TOKENS_ESTIMATE = 5000; // Lowered to 5000 to safely fit Groq's 12,000 TPM limit
 
     for (const file of sortedFiles) {
         if (currentTokenEstimate > MAX_TOKENS_ESTIMATE) break;
@@ -152,9 +150,8 @@ function createAnalysisPrompt(
             : file.content;
 
         prompt += `--- File: ${file.path} ---\n${content}\n\n`;
-        currentTokenEstimate += content.length / 4; // Very rough token estimate
+        currentTokenEstimate += content.length / 2.5; // More accurate token estimate for programming code
     }
-
     prompt += `\nProvide your analysis as JSON with this structure:
 {
   "overall": {
