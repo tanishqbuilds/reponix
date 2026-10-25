@@ -153,7 +153,7 @@ export function HeroSection() {
           <Button 
             variant="outline" 
             onClick={() => window.location.href = '/api/auth/github'} 
-            className="flex items-center gap-2 rounded-full border-border bg-card/50 backdrop-blur-sm text-foreground hover:bg-secondary/80 transition-all hover:scale-105"
+            className="flex items-center gap-2 rounded-full border-border bg-card/50 backdrop-blur-sm text-foreground hover:bg-secondary/80 hover:text-foreground transition-all hover:scale-105"
           >
             <Github className="w-4 h-4" />
             Connect GitHub

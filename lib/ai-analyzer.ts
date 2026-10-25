@@ -44,6 +44,8 @@ export interface AnalysisResult {
 }
 
 
+export const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+
 export async function analyzeCodeWithGroq(
     files: FileItem[],
     repoName: string
@@ -54,7 +56,7 @@ export async function analyzeCodeWithGroq(
         const prompt = createAnalysisPrompt(files, repoName, contextSummary, heuristics);
 
         const completion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: DEFAULT_GROQ_MODEL,
             messages: [
                 {
                     role: 'system',

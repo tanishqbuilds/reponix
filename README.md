@@ -102,7 +102,7 @@ Client (Next.js) → POST repo URL → API Route (/api/analyze)
 
 ### AI
 - **Groq** - Fast LLM inference
-- **Llama 3.3 70B** - Code analysis model
+- **OpenAI GPT OSS 120B** - Code analysis model (configurable via `GROQ_MODEL`)
 
 ## 📁 Project Structure
 

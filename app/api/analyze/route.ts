@@ -5,7 +5,7 @@ import {
     formatFilesForRAG,
     createRepoSummary
 } from '@/lib/file-processor';
-import { analyzeCodeWithGroq } from '@/lib/ai-analyzer';
+import { analyzeCodeWithGroq, DEFAULT_GROQ_MODEL } from '@/lib/ai-analyzer';
 import { cookies } from 'next/headers';
 
 export const maxDuration = 60; // 60 second timeout for AI analysis
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
             metadata: {
                 processedAt: new Date().toISOString(),
                 analyzedBy: 'Groq AI',
-                model: 'llama-3.3-70b-versatile',
+                model: DEFAULT_GROQ_MODEL,
             }
         });
 
